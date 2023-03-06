@@ -7,27 +7,25 @@
 using namespace std;
 
 
-bool Actor::isSquare() { //Returns true if actor is square, false otherwise
-	return getSW()->boardContents(getX(), getY()) == Board::bank_square || getSW()->boardContents(getX(), getY()) == Board::blue_coin_square || getSW()->boardContents(getX(), getY()) == Board::down_dir_square || getSW()->boardContents(getX(), getY()) == Board::event_square || getSW()->boardContents(getX(), getY()) == Board::left_dir_square || getSW()->boardContents(getX(), getY()) == Board::red_coin_square || getSW()->boardContents(getX(), getY()) == Board::right_dir_square || getSW()->boardContents(getX(), getY()) == Board::star_square || getSW()->boardContents(getX(), getY()) == Board::up_dir_square;
-}
+
 
 std::string Actor::checkFork(int dir) const {
-	int right = getX() + SPRITE_WIDTH <= BOARD_WIDTH ? getX() + SPRITE_WIDTH : -1;
+	int right = getX() + SPRITE_WIDTH <= VIEW_WIDTH ? getX() + SPRITE_WIDTH : -1; //Check if there is a wall in each direction
 	int left = getX() - SPRITE_WIDTH >= 0 ? getX() - SPRITE_WIDTH : -1;
-	int up = getY() + SPRITE_HEIGHT <= BOARD_HEIGHT ? getY() + SPRITE_HEIGHT : -1;
+	int up = getY() + SPRITE_HEIGHT <= VIEW_HEIGHT ? getY() + SPRITE_HEIGHT : -1;
 	int down = getY() - SPRITE_HEIGHT >= 0 ? getY() - SPRITE_HEIGHT : -1;
 	switch (getActorDirection()) {  //Check if there is a fork for each direction
 	case 0:  //Facing right
-		if (right != -1 && up != -1 && down != -1) { //If there is a fork, set string to indicate available paths
+		if (right != -1 && up != -1 && down != -1) {  //Return available paths in fork
 			if ((!getSW()->wallFound(right, getY()) && !getSW()->wallFound(getX(), up) && !getSW()->wallFound(getX(), down))) {
 				return "urd";
 			}
 		}
-		if (right != -1 && down != -1) {
+		if (right != -1 && down != -1) {  //Return available paths in fork
 			if (!getSW()->wallFound(right, getY()) && !getSW()->wallFound(getX(), down))
 				return "rd";
 		}
-		if (up != -1 && down != -1) {
+		if (up != -1 && down != -1) {  //Return available paths in fork
 			if (!getSW()->wallFound(getX(), up) && !getSW()->wallFound(getX(), down))
 				return "ud";
 		}
@@ -36,62 +34,62 @@ std::string Actor::checkFork(int dir) const {
 				return "ur";
 		}
 		break;
-	case 90: //Facing up 
-		if (right != -1 && up != -1 && left != -1) { //If there is a fork, set string to indicate available paths
+	case 90:  //Facing up
+		if (right != -1 && up != -1 && left != -1) {  //Return available paths in fork
 			if ((!getSW()->wallFound(left, getY()) && !getSW()->wallFound(getX(), up) && !getSW()->wallFound(right, getY()))) {
 				return "url";
 			}
 		}
-		if (right != -1 && left != -1) {
+		if (right != -1 && left != -1) {  //Return available paths in fork
 			if (!getSW()->wallFound(right, getY()) && !getSW()->wallFound(left, getY()))
 				return "rl";
 		}
-		if (up != -1 && left != -1) {
+		if (up != -1 && left != -1) {   //Return available paths in fork
 			if (!getSW()->wallFound(left, getY()) && !getSW()->wallFound(getX(), up))
 				return "ul";
 		}
-		if (right != -1 && up != -1) {
+		if (right != -1 && up != -1) {   //Return available paths in fork
 			if (!getSW()->wallFound(right, getY()) && !getSW()->wallFound(getX(), up))
 				return "ur";
 		}
 		break;
-	case 180: //Facing left
-		if (down != -1 && up != -1 && left != -1) { //If there is a fork, set string to indicate available paths
+	case 180:  //Facing left
+		if (down != -1 && up != -1 && left != -1) {   //Return available paths in fork
 			if ((!getSW()->wallFound(left, getY()) && !getSW()->wallFound(getX(), up) && !getSW()->wallFound(getX(), down))) {
 				return "uld";
 			}
 		}
 		if (up != -1 && left != -1) {
-			if (!getSW()->wallFound(left, getY()) && !getSW()->wallFound(getX(), up))
+			if (!getSW()->wallFound(left, getY()) && !getSW()->wallFound(getX(), up))  //Return available paths in fork
 				return "ul";
 		}
 		if (up != -1 && down != -1) {
-			if (!getSW()->wallFound(getX(), up) && !getSW()->wallFound(getX(), down))
+			if (!getSW()->wallFound(getX(), up) && !getSW()->wallFound(getX(), down))  //Return available paths in fork
 				return "ud";
 		}
 		if (down != -1 && left != -1) {
 
-			if (!getSW()->wallFound(left, getY()) && !getSW()->wallFound(getX(), down))
-				return "ld";
+			if (!getSW()->wallFound(left, getY()) && !getSW()->wallFound(getX(), down))  //Return available paths in fork
+				return "ld"; 
 		}
 		break;
 	case 270:  //Facing down
-		if (right != -1 && down != -1 && left != -1) {  //If there is a fork, set string to indicate available paths
+		if (right != -1 && down != -1 && left != -1) {   //Return available paths in fork
 
 			if ((!getSW()->wallFound(left, getY()) && !getSW()->wallFound(getX(), down) && !getSW()->wallFound(right, getY()))) {
 				return "lrd";
 			}
 		}
-		if (right != -1 && left != -1) {
+		if (right != -1 && left != -1) {  //Return available paths in fork
 
 			if (!getSW()->wallFound(left, getY()) && !getSW()->wallFound(right, getY()))
 				return "lr";
 		}
-		if (right != -1 && down != -1) {
+		if (right != -1 && down != -1) {  //Return available paths in fork
 			if (!getSW()->wallFound(right, getY()) && !getSW()->wallFound(getX(), down))
 				return "rd";
 		}
-		if (down != -1 && left != -1) {
+		if (down != -1 && left != -1) {  //Return available paths in fork
 			if (!getSW()->wallFound(left, getY()) && !getSW()->wallFound(getX(), down))
 				return "ld";
 		}
@@ -101,23 +99,22 @@ std::string Actor::checkFork(int dir) const {
 }
 
 void Actor::moveActor() {
-	switch (getActorDirection()) {  //Move based on direction
+	switch (getActorDirection()) {
 	case 0:
-		moveTo(getX() + 2, getY());
-
+			moveTo(getX() + 2, getY());
+	
 		break;
 	case 90:
-		moveTo(getX(), getY() + 2);
-
-
+			moveTo(getX() , getY()+2);
+	
 		break;
 	case 180:
-		moveTo(getX() - 2, getY());
-
+			moveTo(getX() - 2, getY());
+		
 		break;
 	case 270:
-		moveTo(getX(), getY() - 2);
-
+			moveTo(getX(), getY()-2);
+		
 		break;
 
 	}
@@ -150,7 +147,7 @@ void Actor::changeDirection(char turn) {  //Change direction of actor
 	}
 	switch (direction) {
 	case 0:   //Facing right
-		if ((onSquare() && sw->wallFound(getX() + SPRITE_WIDTH, getY()) == true)) {  //If a wall was found at that point, 
+		if (sw->wallFound(getX() + SPRITE_WIDTH, getY()) == true) {  //If a wall was found at that point, 
 			if (sw->wallFound(getX(), getY() + SPRITE_HEIGHT) == false) {
 				direction = 90;  //Change direction
 				setDirection(0);  //Change direction to up
@@ -164,12 +161,12 @@ void Actor::changeDirection(char turn) {  //Change direction of actor
 		}
 		break;
 	case 90:  //Facing up
-		if ((getY() % 16 == 0 && getX() % 16 == 0 && sw->wallFound(getX(), getY() + SPRITE_HEIGHT) == true)) {  //If a wall was found at that point, 
+		if ( sw->wallFound(getX(), getY() +SPRITE_HEIGHT) == true) {  //If a wall was found at that point, 
 			if (sw->wallFound(getX() + SPRITE_WIDTH, getY()) == false) {
 				direction = 0;  //Change direction
 				setDirection(0);  //Change direction to right
 			}
-			else if (sw->wallFound(getX() - SPRITE_WIDTH, getY()) == false) {
+			else if (sw->wallFound(getX() -SPRITE_WIDTH, getY()) == false) {
 				direction = 180;  //Change direction
 				setDirection(180);  //Change direction to left
 
@@ -177,7 +174,7 @@ void Actor::changeDirection(char turn) {  //Change direction of actor
 		}
 		break;
 	case 180:  //Facing left
-		if ((onSquare() && sw->wallFound(getX() - SPRITE_WIDTH, getY()) == true)) {  //If a wall was found at that point, 
+		if (sw->wallFound(getX() - SPRITE_WIDTH, getY()) == true) {  //If a wall was found at that point, 
 			if (sw->wallFound(getX(), getY() + SPRITE_HEIGHT) == false) {
 				direction = 90;  //Change direction
 				setDirection(0);  //Change direction to left
@@ -190,7 +187,7 @@ void Actor::changeDirection(char turn) {  //Change direction of actor
 		}
 		break;
 	case 270:   //Facing down
-		if ((getY() % 16 == 0 && getX() % 16 == 0 && sw->wallFound(getX(), getY() - SPRITE_HEIGHT) == true)) {  //If a wall was found at that point, 
+		if (sw->wallFound(getX(), getY() - SPRITE_HEIGHT) == true) {  //If a wall was found at that point, 
 			if (sw->wallFound(getX() + SPRITE_WIDTH, getY()) == false) {
 				direction = 0;  //Change direction
 				setDirection(0);  //Change direction to right
@@ -210,24 +207,25 @@ void Actor::changeDirection(char turn) {  //Change direction of actor
 bool Actor::checkValidDir() { //Check if direction is valid
 	switch (getActorDirection()) {
 	case 0:
-		if ((onSquare() && sw->wallFound(getX() + SPRITE_WIDTH, getY()) == true))   //If a wall was found at that point, 
+		if (sw->wallFound(getX() + SPRITE_WIDTH, getY()) == true)   //If a wall was found at that point, 
 			return false;
 		break;
 	case 90:
-		if ((onSquare() && sw->wallFound(getX(), getY() + SPRITE_HEIGHT) == true))   //If a wall was found at that point, 
+		if (sw->wallFound(getX(), getY() + SPRITE_HEIGHT) == true)   //If a wall was found at that point, 
 			return false;
 		break;
 	case 180:
-		if ((onSquare() && sw->wallFound(getX() - SPRITE_WIDTH, getY()) == true))   //If a wall was found at that point, 
+		if (sw->wallFound(getX() - SPRITE_WIDTH, getY()) == true)   //If a wall was found at that point, 
 			return false;
 		break;
 	case 270:
-		if ((onSquare() && sw->wallFound(getX(), getY() - SPRITE_HEIGHT) == true))   //If a wall was found at that point, 
+		if (sw->wallFound(getX(), getY() - SPRITE_HEIGHT) == true)   //If a wall was found at that point, 
 			return false;
 		break;
 	}
 	return true;
 }
+
 int Square::deductCoins(int amt, Avatar* avatar) {
 	if (avatar->getCoins() - amt >= 0) {  //If the player has at least 5 coins
 		avatar->setCoins(avatar->getCoins() - amt);  //Take 5 of their coins and deposit into bank
@@ -244,7 +242,7 @@ void Actor::resetActivation(Avatar* avatar, bool& activation) {
 	if (avatar != nullptr) {
 		int x1 = avatar->getX();
 		int x2 = getY();
-		if (getSW()->overlapsBaddie(avatar->getX(), avatar->getY()) == nullptr)  //Reset once they move off of it
+		if (getX() != avatar->getX() || getY() != avatar->getY())  //Reset once they move off of it
 			activation = false;
 	}
 
@@ -276,10 +274,12 @@ bool Actor::passedSquare(int x, int y, Avatar* avatar, bool& activation) {
 void CoinSquare::doSomething() {  //Manages behavior of square
 	if (getStatus()) { //Check if alive
 		if (landedOnSquare(getX(), getY(), getSW()->getPeach(), peachActivated)) { //If player landed on coin square
-			if (getSW()->boardContents(getX(), getY()) == Board::blue_coin_square) { //Add coins if blue
+			if (getSW()->boardContents(getX(), getY()) == Board::blue_coin_square) {
 				getSW()->getPeach()->setCoins(getSW()->getPeach()->getCoins() + 3);
+				getSW()->playSound(SOUND_GIVE_COIN);
+
 			}
-			else if (getSW()->boardContents(getX(), getY()) == Board::red_coin_square) { //Take away coins if red
+			else if (getSW()->boardContents(getX(), getY()) == Board::red_coin_square) {
 				getSW()->getPeach()->setCoins(getSW()->getPeach()->getCoins() - 3);
 				getSW()->playSound(SOUND_TAKE_COIN);
 			}
@@ -288,10 +288,10 @@ void CoinSquare::doSomething() {  //Manages behavior of square
 
 		if (landedOnSquare(getX(), getY(), getSW()->getYoshi(), yoshiActivated)) { //If player landed on coin square
 			if (getSW()->boardContents(getX(), getY()) == Board::blue_coin_square) {
-				getSW()->getYoshi()->setCoins(getSW()->getYoshi()->getCoins() + 3);  //Add coins if blue
+				getSW()->getYoshi()->setCoins(getSW()->getYoshi()->getCoins() + 3);
 				getSW()->playSound(SOUND_GIVE_COIN);
 			}
-			else if (getSW()->boardContents(getX(), getY()) == Board::red_coin_square) {  //Take away coins if red
+			else if (getSW()->boardContents(getX(), getY()) == Board::red_coin_square) {
 				getSW()->getYoshi()->setCoins(getSW()->getYoshi()->getCoins() - 3);
 				getSW()->playSound(SOUND_TAKE_COIN);
 			}
@@ -360,7 +360,7 @@ void BankSquare::doSomething() {
 }
 
 void EventSquare::doSomething() {
-	if (landedOnSquare(getX(), getY(), getSW()->getPeach(), peachActivated))  //If on square, activate event for Peach and Yoshi
+	if (landedOnSquare(getX(), getY(), getSW()->getPeach(), peachActivated))  //Activate event for both players
 		activateEvent(getSW()->getPeach());
 
 	if (landedOnSquare(getX(), getY(), getSW()->getYoshi(), yoshiActivated))
@@ -391,8 +391,8 @@ void EventSquare::activateEvent(Avatar* avatar) {
 
 
 void DroppingSquare::dropSomething(Avatar* avatar, bool& activation) {
-	if (landedOnSquare(getX(), getY(), avatar, activation)) {
-		switch (randInt(1, 2)) {  //Randomly deduct coins or stars and play sound
+	if (landedOnSquare(getX(), getY(), avatar, activation)) {  //If player landed on a square,
+		switch (randInt(1, 2)) {   //Randomly deduct coins or a star and play sound
 		case 1:
 			deductCoins(10, avatar);
 			break;
@@ -414,13 +414,13 @@ void Vortex::doSomething() {
 	if (!getStatus()) {  //Return if not alive
 		return;
 	}
-	moveActor();  //Move actor every tick
+	moveActor();  //Move vortex
 
-	if (getX() > BOARD_WIDTH || getX() < 0 || getY() < 0 || getY() > BOARD_HEIGHT) {  //Kill if leaves bounds
+	if (getX() > BOARD_WIDTH || getX() < 0 || getY() < 0 || getY() > BOARD_HEIGHT) {  //Kill if out of bounds
 		setStatus(false);
 	}
 	Actor* baddie = getSW()->overlapsBaddie(getX(), getY());
-	if (baddie != nullptr) {  //If baddie hit, kill it
+	if (baddie != nullptr) {  //If baddie hit, impact it
 		baddie->setImpacted(true);
 		setStatus(false);  //Delete self
 		getSW()->playSound(SOUND_HIT_BY_VORTEX);
@@ -429,31 +429,12 @@ void Vortex::doSomething() {
 }
 
 bool Actor::forkContains(std::string dir) {
-	return checkFork(getActorDirection()).find(dir) != std::string::npos;
+	return checkFork(getActorDirection()).find(dir) != std::string::npos;  //Return if direction is found in fork
 }
 
-bool Actor::onSquare() { //Check if on a square
-	return (getX() % 16 == 0 && getY() % 16 == 0);
-}
 
-void Actor::forkDir(int num) {  //Set direction based on fork and user input
-	int input = getSW()->getAction(num);
-	if (input == ACTION_LEFT && forkContains("l") && onSquare()) {
-		changeDirection('l');
-	}
-	else if (input == ACTION_RIGHT && forkContains("r") && onSquare()) {
-		changeDirection('r');
-	}
-	else if (input == ACTION_DOWN && forkContains("d") && onSquare()) {
-		changeDirection('d');
-	}
-	else if (input == ACTION_UP && forkContains("u") && onSquare()) {
-		changeDirection('u');
-	}
-	else {
-		return;
-	}
-}
+
+
 void Avatar::doSomething()
 {
 	int input = getSW()->getAction(playerNum);
@@ -503,15 +484,34 @@ void Avatar::doSomething()
 			changeDirection('r');
 		}
 		else if (checkFork(getActorDirection()) != "") { //If there is a fork, change direction based on user input				
-			forkDir(playerNum);
+			int input = getSW()->getAction(playerNum);
+			if (getX() % SPRITE_WIDTH == 0 && getY() % SPRITE_HEIGHT == 0) {
+				if (input == ACTION_LEFT && forkContains("l")) {
+					changeDirection('l');
+					moveActor();
+				}
+				else if (input == ACTION_RIGHT && forkContains("r")) {
+					changeDirection('r');
+					moveActor();
+				}
+				else if (input == ACTION_DOWN && forkContains("d")) {
+					changeDirection('d');
+					moveActor();
+				}
+				else if (input == ACTION_UP && forkContains("u")) {
+					changeDirection('u');
+					moveActor();
+
+				}
+
+				else {
+					return;
+				}
+			}
 		}
-		changeDirection();
-		if (checkFork(getActorDirection()) == "")
-			moveActor();
-		else {
-			forkDir(playerNum);
-			moveActor();
-		}
+			changeDirection();
+		
+				moveActor();
 		ticks_to_move--;  //Decrement ticks to move
 		if (!ticks_to_move)  //If ticks to move is zero, set waiting to roll to true
 			waitingToRoll = true;
@@ -554,11 +554,11 @@ void newCoords(int& x, int& y) {
 void Actor::teleport() {
 	int x, y;
 	newCoords(x, y);
-	while (!isSquare()) {  //Loop while  (x,y) is not a square
+	while (getSW()->isSquare(x,y) == nullptr) {  //Loop while  (x,y) is not a square
 		newCoords(x, y); //Randomize again
 
 	}
-	moveTo(x * SPRITE_WIDTH, y * SPRITE_HEIGHT);  //Move the avatar there
+	moveTo(x , y );  //Move the avatar there
 }
 
 void Baddies::pauseAction(Avatar* avatar, bool activation, std::string baddie) {
@@ -582,19 +582,20 @@ void Baddies::pauseAction(Avatar* avatar, bool activation, std::string baddie) {
 				}
 			}
 			else if (baddie == "Boo") {
-				if (avatar->getPlayerNum() == 1) {  //Swap them if Boo
+				if (avatar->getPlayerNum() == 1 && getSW()->getYoshi() != nullptr) {  //Swap them if Boo
 					avatar->swapCoins(getSW()->getYoshi());
 					avatar->swapStars(getSW()->getYoshi());
 				}
-				else if (avatar->getPlayerNum() == 2) {
+				else if (avatar->getPlayerNum() == 2 && getSW()->getPeach() != nullptr) {
 					avatar->swapCoins(getSW()->getPeach());
 					avatar->swapStars(getSW()->getPeach());
 
 				}
-				getSW()->playSound(baddie == "Bowser" ? SOUND_BOWSER_ACTIVATE : SOUND_BOO_ACTIVATE);  //Play sound if Bowser or Boo
-				setPeachActivation(avatar->getPlayerNum() == 1 ? true : getPeachActivation());  //Set activation as needed
-				setYoshiActivation(avatar->getPlayerNum() == 2 ? true : getYoshiActivation());
 			}
+			getSW()->playSound(baddie == "Bowser" ? SOUND_BOWSER_ACTIVATE : SOUND_BOO_ACTIVATE);  //Play sound if Bowser or Boo
+			setPeachActivation(avatar->getPlayerNum() == 1 ? true : getPeachActivation());  //Set activation as needed
+			setYoshiActivation(avatar->getPlayerNum() == 2 ? true : getYoshiActivation());
+
 
 		}
 		if (floor(getX() / SPRITE_WIDTH) != floor(avatar->getX() / SPRITE_WIDTH) || floor(avatar->getY() / SPRITE_HEIGHT) != floor(getY() / SPRITE_HEIGHT)) {  //Reset once they move off of it
@@ -605,9 +606,9 @@ void Baddies::pauseAction(Avatar* avatar, bool activation, std::string baddie) {
 }
 void Baddies::doSomething(std::string baddie) {
 	if (getPaused()) {
-		pauseAction(getSW()->getPeach(), getPeachActivation(), baddie);
+		pauseAction(getSW()->getPeach(), getPeachActivation(), baddie);  //Pause actions for both players
 		pauseAction(getSW()->getYoshi(), getYoshiActivation(), baddie);
-		setPauseCount(getPauseCount() - 1);
+		setPauseCount(getPauseCount() - 1);  //Decrement pause ticks
 		if (getPauseCount() <= 0) {
 			int squares_to_move = randInt(1, baddie == "Bowser" ? 10 : 3);
 			setTicks(squares_to_move * 8);
@@ -631,7 +632,7 @@ void Baddies::doSomething(std::string baddie) {
 		}
 	}
 	if (!getPaused()) {
-		if (onSquare()) { //If on top of square
+		if (getX() % 16 == 0 && getY() % 16 == 0) { //If on top of square
 			if (checkFork(getActorDirection()) != "")  //If at fork
 				switch (randInt(1, 4)) { //Randomly select direction if valid
 				case 1:

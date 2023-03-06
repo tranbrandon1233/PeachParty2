@@ -22,6 +22,7 @@ public:
 	Board* getBoard() const { return m_board; }
 	Avatar* getPeach() { return m_peach; }
 	Avatar* getYoshi() { return m_yoshi; }
+	Actor* isSquare(int x, int y);
 	void addActor(Actor* actor);
 	void addPeach(const int x, const int y);
 	void addYoshi(const int x, const int y);

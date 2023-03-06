@@ -14,7 +14,7 @@ GameWorld* createStudentWorld(string assetPath)
 // Students:  Add code to this file, StudentWorld.h, Actor.h, and Actor.cpp
 
 StudentWorld::StudentWorld(string assetPath)
-	: GameWorld(assetPath), m_actors(), m_board(), m_peach(), m_yoshi(), bankTotal(0)
+	: GameWorld(assetPath), m_actors(), m_board(), m_peach(nullptr), m_yoshi(nullptr), bankTotal(0)
 {
 }
 
@@ -28,7 +28,7 @@ int StudentWorld::init()
 	std::string file = assetPath() + "board0" + std::to_string(getBoardNumber()) + ".txt";
 
 	Board::LoadResult result = m_board->loadBoard(file);
-
+	startCountdownTimer(99);  //Start timer
 	int i = 0;  //Track index of vector
 	bool player1Used = false;  //Track if Peach is used for Player 1
 	for (int gy = 0; gy < BOARD_HEIGHT; gy++) {  //For entire grid
@@ -94,63 +94,88 @@ int StudentWorld::move()
 
 
 
-
-	for (auto actor : m_actors) {
-		if (actor != nullptr && actor->getStatus()) {
-			actor->doSomething();  //Each actor runs doSomething every tick
-			/*  Causes memory access error
-			if (!actor->getStatus()) {
-				//m_actors.remove(actor);
-				delete actor;
-			*/
+	for (list<Actor*>::iterator itr = m_actors.begin(); itr != m_actors.end();){
+			if (!(*itr)->getStatus()) { //If actor is dead, delete it and erase it from the list
+				delete *itr;
+				itr = m_actors.erase(itr);
 		}
+			else {
+				(*itr)->doSomething();  //Each actor runs doSomething every tick
+				itr++;
+			}
 	}
 
 	// Update the Game Status 
-	if (getPeach() != nullptr && getYoshi() != nullptr) { //Display text 
-		setGameStatText("Peach's Coins: " + std::to_string(getPeach()->getCoins()) + "  Peach's Stars: " + std::to_string(getPeach()->getStars()) + "\nYoshi's Coins: " + std::to_string(getYoshi()->getCoins()) + "  Yoshi's Stars: " + std::to_string(getYoshi()->getStars()));
+	if (getPeach() != nullptr && getYoshi() != nullptr) { //String if both players are playing
+		std::string peachVortex = getPeach()->getVortex() ? " VOR" : "";
+		std::string yoshiVortex = getYoshi()->getVortex() ? " VOR" : "";
+		setGameStatText("P1 Roll : " + std::to_string(getPeach()->getTicks()) + " Stars : " + std::to_string(getPeach()->getStars()) + " $$ : " + std::to_string(getPeach()->getCoins()) + peachVortex + " | Time : " + std::to_string(timeRemaining()) + " | Bank : " + std::to_string(getBankTotal()) + " | P2 Roll : " + std::to_string(getYoshi()->getTicks()) + " Stars : " + std::to_string(getYoshi()->getStars()) + " $$ : " + std::to_string(getYoshi()->getCoins()) + yoshiVortex);
 		setFinalScore(getYoshi()->getStars(), getYoshi()->getCoins());
 		setFinalScore(getPeach()->getStars(), getPeach()->getCoins());
 	}
-	else if (getPeach() != nullptr) {
-		if (getPeach()->getCoins() != NULL && getPeach()->getStars() != NULL)
-			setGameStatText("Peach's Coins: " + std::to_string(getPeach()->getCoins()) + "  Peach's Stars: " + std::to_string(getPeach()->getStars()));
+	else if (getPeach() != nullptr) {  //String if only Peach is playing
+		if (getPeach()->getCoins() == NULL && getPeach()->getStars() == NULL) {
+			getPeach()->setCoins(0);
+			getPeach()->setStars(0);
+		}
+			std::string peachVortex = getPeach()->getVortex() ? " VOR" : "";
+			setGameStatText("P1 Roll : " + std::to_string(getPeach()->getTicks()) + " Stars : " + std::to_string(getPeach()->getStars()) + " $$ : " + std::to_string(getPeach()->getCoins())  + peachVortex + " | Time : " + std::to_string(timeRemaining()) + " | Bank : " + std::to_string(getBankTotal()));
+		
 	}
-	else if (getYoshi() != nullptr) {
-		if (getYoshi()->getCoins() != NULL && getYoshi()->getStars() != NULL)
-			setGameStatText("Yoshi's Coins: " + std::to_string(getPeach()->getCoins()) + "  Yoshi's Stars: " + std::to_string(getPeach()->getStars()));
+	else if (getYoshi() != nullptr) {  //String if only Yoshi is playing
+		if (getYoshi()->getCoins() != NULL && getYoshi()->getStars() != NULL) {
+			getYoshi()->setCoins(0);
+			getYoshi()->setStars(0);
+		}
+			std::string yoshiVortex = getYoshi()->getVortex() ? " VOR" : "";
+			setGameStatText("Time : " + std::to_string(timeRemaining()) + " | Bank : " + std::to_string(getBankTotal()) + " | P2 Roll : " + std::to_string(getYoshi()->getTicks()) + " Stars : " + std::to_string(getYoshi()->getStars()) + " $$ : " + std::to_string(getYoshi()->getCoins()) + yoshiVortex);
+
+		
 	}
 
 	if (timeRemaining() == 0)  //If out of time
 	{
 
-		playSound(SOUND_GAME_FINISHED);  //Finish game and tally score for winner
-		if (getYoshi()->getCoins() + getYoshi()->getStars() > getPeach()->getCoins() + getPeach()->getStars())
-		{
+		playSound(SOUND_GAME_FINISHED);  //Finish game and find winner
+		if (getYoshi() != nullptr && getPeach() != nullptr) {
+			if (getYoshi()->getCoins() + getYoshi()->getStars() > getPeach()->getCoins() + getPeach()->getStars())
+			{
+				setFinalScore(getYoshi()->getStars(), getYoshi()->getCoins());
+				return GWSTATUS_YOSHI_WON;
+			}
+			else // peach won
+			{
+				setFinalScore(getPeach()->getStars(), getPeach()->getCoins());
+				return GWSTATUS_PEACH_WON;
+			}
+		}
+		else if (getYoshi() != nullptr) { //Yoshi wins if Peach is not there
 			setFinalScore(getYoshi()->getStars(), getYoshi()->getCoins());
 			return GWSTATUS_YOSHI_WON;
 		}
-		else // peach won
-		{
+		else if (getPeach() != nullptr) { //Peach wins if Yoshi is not there
 			setFinalScore(getPeach()->getStars(), getPeach()->getCoins());
 			return GWSTATUS_PEACH_WON;
+
 		}
 	}
 
-	return GWSTATUS_CONTINUE_GAME;
+	return GWSTATUS_CONTINUE_GAME; //Continue otherwise
 }
 
 void StudentWorld::cleanUp()
 {
-	for (Actor* i : m_actors) {  //Delete all actors in vector
-		delete i;
-	}
-	m_actors.clear(); //Clear vector
+	for (list<Actor*>::iterator itr = m_actors.begin(); itr != m_actors.end();) {
+			delete* itr;
+			itr = m_actors.erase(itr);
+			itr++;
+		}
+	m_actors.clear(); //Clear list
 	delete m_board;  //Delete board
 }
 
 Actor* StudentWorld::overlapsBaddie(int x, int y) const { //Check if there is an overlap at (x,y)
-	for (auto actor : m_actors) {  //For each actor in vector
+	for (auto actor : m_actors) {  //For each actor in list
 		if (actor->ifBaddie()) { //Check if there is sprite overlap for baddies only
 
 			switch (actor->getDirection()) { //Depending on the direction,
@@ -188,20 +213,28 @@ const bool StudentWorld::wallFound(int x, int y)  //Check if there is an overlap
 
 void StudentWorld::deleteSquare(int x, int y) {
 	for (auto actor : m_actors) {
-		if (actor->getX() == x && actor->getY() == y && actor->isSquare()) {  //Check if there is an actor at (x,y) and is a square
+		if (actor->getX() == x && actor->getY() == y && isSquare(actor->getX(), actor->getY()) == actor) {  //Check if there is an actor at (x,y) and is a square
 			actor->setStatus(false);
 			break;
 		}
 	}
 }
 
+Actor* StudentWorld::isSquare(int x, int y) {
+	for (auto actor : m_actors) {
+		if (actor->getX() == x && actor->getY() == y && actor->ifSquare()) //Check if there is an actor at (x,y) and is a square
+			return actor; //Return the square
+	}
+	return nullptr; //Return nullptr if not found
+}
+
 void StudentWorld::addPeach(const int x, const int y) {  //Methods for all actors
-	m_yoshi = new Avatar(this, 1, x, y);
-	addActor(m_yoshi);
+	m_peach = new Avatar(this, 1, x, y);
+	addActor(m_peach);
 }
 void StudentWorld::addYoshi(const int x, const int y) {
-	m_peach = new Avatar(this, 2, x, y);
-	addActor(m_peach);
+	m_yoshi = new Avatar(this, 2, x, y);
+	addActor(m_yoshi);
 }
 void StudentWorld::addRedCoin(const int x, const int y) { addActor(new CoinSquare(this, 'r', x, y)); }
 void StudentWorld::addBlueCoin(const int x, const int y) { addActor(new CoinSquare(this, 'b', x, y)); }
